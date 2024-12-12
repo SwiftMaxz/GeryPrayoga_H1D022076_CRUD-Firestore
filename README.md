@@ -1,100 +1,35 @@
-# Google Authentication with Firebase
+# Todo List App with Firestore
 
-Project ini mendemonstrasikan cara mengintegrasikan Autentikasi Google ke dalam aplikasi Ionic + Vue menggunakan Firebase.
+Todo List App dibuat dengan Ionic dan terintegrasi dengan Firebase Firestore. Merupakan pengembangan lanjutan dari Ionic-vue-firebase.
 
 ## Screenshots
 
-### 1. Login Screen
-Halaman login memungkinkan pengguna untuk masuk dengan akun Google.
+### Home Screen v2
+![Home Screen](assets/screenshots/homev2.png) | ![Active Actions](assets/screenshots/active_actions.png)
+Menampilkan todo aktif dan yang telah selesai. Fitur-fitur utama meliputi:
+- Floating action button (`+`) untuk menambahkan todo baru.
+- Todo list dengan swipe gesture untuk quick action seperti mengedit, menyelesaikan, atau menghapus todo.
+- Fungsi pull-to-refresh.
 
-![Login Screen](assets/screenshots/login.png)
+### Add Todo
+![Add Todo](assets/screenshots/add_todo.png)
+Untuk menambahkan todo baru. Pengguna bisa:
+- Memasukkan judul dan deskripsi todo.
+- Menyimpan todo dengan mengklik tombol “Add Todo”.
 
-### 2. Home Screen
-Setelah masuk, terdapat halaman beranda dengan opsi menu pada bagian bawah dan tombol logout pada bagian kanan atas.
+### Edit Todo
+![Edit Todo](assets/screenshots/edit_todo.png)
+Mirip dengan  “Add Todo” namun sudah diisi sebelumnya dengan rincian todo yang dipilih. Pengguna dapat:
+- Memperbarui judul dan deskripsi.
+- Menyimpan perubahan dengan mengeklik tombol “Edit Todo”.
 
-![Home Screen](assets/screenshots/home.png)
+### Completed Todos (Completed)
+![Completed Todos](assets/screenshots/todo_completed.png) | ![Completed Actions](assets/screenshots/completed_actions.png)
+Menampilkan list todo yang telah ditandai sebagai selesai. Bagian ini:
+- Dapat di-collapse untuk menghemat ruang.
+- Swipe gestures yang memungkinkan pengguna untuk menghapus dan mengedit todo, serta mengembalikan status todo ke aktif.
 
-### 3. Profile Screen
-Halaman profil menampilkan informasi profil pengguna, termasuk nama, email, dan foto profil.
-
-![Profile Screen](assets/screenshots/profile.png)
-
-
-## Cara Kerja
-
-### 1. Inisialisasi Firebase
-SDK Firebase diinisialisasi di dalam file `firebase.ts`. `GoogleAuthProvider` dikonfigurasikan untuk autentikasi.
-
-```
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-
-const firebaseConfig = { /* your configuration */ };
-const firebase = initializeApp(firebaseConfig);
-const auth = getAuth(firebase);
-const googleProvider = new GoogleAuthProvider();
-
-export { auth, googleProvider };
-```
-
-### 2. Login dengan Google
-Fungsi `loginWithGoogle` menangani login Google menggunakan plugin Capacitor Google Auth. Setelah autentikasi, `idToken` dikirim ke Firebase untuk memvalidasi pengguna.
-
-```
-import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-import { auth } from "../firebase";
-
-async function loginWithGoogle() {
-  const googleUser = await GoogleAuth.signIn();
-  const idToken = googleUser.authentication.idToken;
-
-  const credential = GoogleAuthProvider.credential(idToken);
-  const result = await signInWithCredential(auth, credential);
-
-  // Store user information
-  return result.user;
-}
-```
-
-### 3. Menyimpan Informasi User
-Informasi user disimpan dalam `Pinia` untuk akses global.
-
-```
-import { defineStore } from "pinia";
-
-export const useUserStore = defineStore("user", {
-  state: () => ({
-    user: null,
-  }),
-  actions: {
-    setUser(user) {
-      this.user = user;
-    },
-  },
-});
-```
-
-### 4. Menampilkan Informasi Profil
-Informasi profil ditampilkan dalam komponen `ProfilePage.vue`. Komponen ini mengambil detail pengguna dari store Pinia kemudian dimasukkan ke elemen UI.
-```
-<template>
-  <div>
-    <img :src="user.photoURL" alt="User Avatar" />
-    <h1>{{ user.displayName }}</h1>
-    <p>{{ user.email }}</p>
-  </div>
-</template>
-
-<script>
-import { useUserStore } from "../stores/user";
-
-export default {
-  setup() {
-    const userStore = useUserStore();
-    return { user: userStore.user };
-  },
-};
-</script>
-```
+### Delete Todo
+![Delete Todo](assets/screenshots/delete_todo.png)
+Menghapus todo dari list todo aktif atau selesai.
 
